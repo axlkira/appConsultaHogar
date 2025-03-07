@@ -211,7 +211,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success" id="downloadFicha">
+                    <button type="button"   class="btn btn-success" id="downloadFicha">
                         <i class="bi bi-download"></i> Descargar Ficha
                     </button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -280,7 +280,7 @@
                                             <button class="btn btn-sm btn-primary" onclick="showDetails('${result.folio}')" title="Ver detalles">
                                                 <i class="bi bi-eye"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-success" onclick="downloadFicha('${result.folio}')" title="Descargar ficha">
+                                            <button class="btn btn-sm btn-success"  onclick="downloadFicha('${result.folio}')" title="Descargar ficha">
                                                 <i class="bi bi-download"></i>
                                             </button>
                                         </div>
