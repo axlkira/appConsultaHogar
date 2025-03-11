@@ -192,6 +192,36 @@
         </div>
     </div>
 
+    <!-- Modal para logros -->
+    <div class="modal fade" id="logrosModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Logros de: <span id="nombreIntegrante"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="logrosContent" class="container-fluid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para detalle de logro -->
+    <div class="modal fade" id="detalleLogroModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detalle del Logro</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="detalleLogroContent" class="container-fluid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -270,7 +300,7 @@
             // Crear un formulario temporal
             const form = $('<form>', {
                 'method': 'POST',
-                'action': '{{ route("consultaHogar.downloadFicha") }}',
+                'action': '{{ route('consultaHogar.downloadFicha') }}',
             });
 
             // Agregar el token CSRF
@@ -396,17 +426,27 @@
                             </div>
                         `;
                         
-                        // Luego construimos los detalles de los logros
+                        // Procesar cada logro
                         response.logros.forEach(logro => {
                             if(logro.dimension !== currentDimension) {
-                                if(currentDimension !== '') html += '</div>';
+                                if(currentDimension !== '') html += '</tbody></table></div></div>';
                                 currentDimension = logro.dimension;
                                 html += `
-                                    <div class="dimension-section mb-4">
-                                    <h5 class="bg-primary text-white p-2 rounded">${logro.dimension}</h5>
+                                    <div class="dimension-container mb-4">
+                                        <h5 class="bg-primary text-white p-2 rounded">${logro.dimension}</h5>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <thead style="background-color: #0D6EFD; color: white;">
+                                                    <tr>
+                                                        <th>Logro</th>
+                                                        <th>Estado Inicial</th>
+                                                        <th>Estado Final</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
                                 `;
                             }
-                            
+
                             // Determinar el color para DI (Diagnóstico Inicial)
                             const colorDI = getColorClass(logro.colorlogroDI);
                             const estadoDI = getEstadoLogro(logro.colorlogroDI);
@@ -414,31 +454,26 @@
                             // Determinar el color para DF (Diagnóstico Final)
                             const colorDF = getColorClass(logro.colorlogroPF);
                             const estadoDF = getEstadoLogro(logro.colorlogroPF);
-                            
+
+                            // Añadir fila de logro
                             html += `
-                                <div class="logro-item p-2 border-bottom">
-                                    <div class="row align-items-center">
-                                        <div class="col-md-8">
-                                            <p class="mb-0">${logro.logro}</p>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="d-flex justify-content-end">
-                                                <div class="me-3">
-                                                    <span class="badge bg-${colorDI} me-1" style="width: 25px; height: 25px; border-radius: 50%;">&nbsp;</span>
-                                                    <small>DI</small>
-                                                </div>
-                                                <div>
-                                                    <span class="badge bg-${colorDF} me-1" style="width: 25px; height: 25px; border-radius: 50%;">&nbsp;</span>
-                                                    <small>DF</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <tr>
+                                    <td>
+                                        <a href="#" class="logro-link" 
+                                           data-idlogro="${logro.idlogro}" 
+                                           data-iddimension="${logro.iddimension}" 
+                                           data-folio="${folio}" 
+                                           data-idintegrante="${idintegrante}">
+                                            ${logro.logro}
+                                        </a>
+                                    </td>
+                                    <td><span class="badge bg-${colorDI}">${estadoDI}</span></td>
+                                    <td><span class="badge bg-${colorDF}">${estadoDF}</span></td>
+                                </tr>
                             `;
                         });
-                        
-                        if(currentDimension !== '') html += '</div>';
+
+                        if(currentDimension !== '') html += '</tbody></table></div></div>';
                         
                         // Agregar resumen de porcentajes si están disponibles
                         if(response.porcentajeLogrosAplican && response.porcentajeLogrosAplican.length > 0) {
@@ -496,6 +531,68 @@
             };
             return estados[color] || 'Sin estado';
         }
+
+        // Evento para mostrar el detalle de un logro
+        $(document).on('click', '.logro-link', function(e) {
+            e.preventDefault();
+            
+            const idlogro = $(this).data('idlogro');
+            const iddimension = $(this).data('iddimension');
+            const folio = $(this).data('folio');
+            const idintegrante = $(this).data('idintegrante');
+            
+            // Mostrar spinner de carga
+            $('#loadingSpinner').removeClass('d-none');
+            
+            // Ocultar el modal de logros
+            $('#logrosModal').modal('hide');
+            
+            // Realizar la petición AJAX para obtener el detalle del logro
+            $.ajax({
+                url: '{{ route("consultaHogar.detalle-logro") }}',
+                method: 'POST',
+                data: {
+                    idlogro: idlogro,
+                    iddimension: iddimension,
+                    folio: folio,
+                    idintegrante: idintegrante,
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    // Ocultar spinner de carga
+                    $('#loadingSpinner').addClass('d-none');
+                    
+                    if(response.success) {
+                        // Cargar el contenido en el modal
+                        $('#detalleLogroContent').html(response.html);
+                        
+                        // Mostrar el modal
+                        $('#detalleLogroModal').modal('show');
+                    } else {
+                        alert('Error: ' + response.error);
+                    }
+                },
+                error: function(xhr) {
+                    // Ocultar spinner de carga
+                    $('#loadingSpinner').addClass('d-none');
+                    
+                    let errorMsg = 'Error al cargar el detalle del logro';
+                    if (xhr.responseJSON && xhr.responseJSON.error) {
+                        errorMsg = xhr.responseJSON.error;
+                    }
+                    alert(errorMsg);
+                }
+            });
+        });
+        
+        // Evento para volver a la lista de logros desde el detalle
+        $(document).on('click', '#btnVolverLogros', function() {
+            // Ocultar el modal de detalle
+            $('#detalleLogroModal').modal('hide');
+            
+            // Mostrar el modal de logros
+            $('#logrosModal').modal('show');
+        });
     </script>
 </body>
 </html>

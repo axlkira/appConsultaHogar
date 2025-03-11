@@ -450,4 +450,68 @@ class ConsultaHogarController extends Controller
             ], 500);
         }
     }
+
+    public function getDetalleLogro(Request $request)
+    {
+        try {
+            $idlogro = $request->input('idlogro');
+            $iddimension = $request->input('iddimension');
+            $folio = $request->input('folio');
+            $idintegrante = $request->input('idintegrante');
+            
+            if (empty($idlogro) || empty($folio)) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'ID de logro y folio son requeridos'
+                ], 400);
+            }
+
+            // Obtener resultado detallado del logro para todos los integrantes
+            $logroResultado = DB::select('call familiam_bdprotocoloservidor.sp4logroresultado(?, ?)', [$folio, $idlogro]);
+            
+            // Obtener datos del integrante actual (para mostrar en el encabezado)
+            $datosIntegrante = DB::select('call familiam_modulo_cif.spdatosintegrante(?, ?)', [$folio, $idintegrante]);
+            
+            // Mapeo de colores a nombres de clases
+            $colorClasses = [
+                0 => 'badge-rojo',    // Rojo - No cumple
+                1 => 'badge-verde',   // Verde - Cumple
+                2 => 'badge-gris',    // Gris - No aplica
+                3 => 'badge-azul',    // Azul - En proceso
+                4 => 'badge-cafe',    // Café - Pendiente
+                5 => 'badge-blanco'   // Blanco - No evaluado
+            ];
+            
+            // Mapeo de colores a textos descriptivos
+            $colorTexts = [
+                0 => 'No cumple',
+                1 => 'Cumple',
+                2 => 'No aplica',
+                3 => 'En proceso',
+                4 => 'Pendiente',
+                5 => 'No evaluado'
+            ];
+            
+            // Renderizar la vista con los datos
+            $html = view('components.detalle-logro', [
+                'logroResultado' => $logroResultado,
+                'datosIntegrante' => $datosIntegrante,
+                'colorClasses' => $colorClasses,
+                'colorTexts' => $colorTexts,
+                'folio' => $folio,
+                'idlogro' => $idlogro,
+                'idintegrante' => $idintegrante
+            ])->render();
+            
+            return response()->json([
+                'success' => true,
+                'html' => $html
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al obtener detalle del logro: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

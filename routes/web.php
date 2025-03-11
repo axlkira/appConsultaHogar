@@ -27,6 +27,7 @@ Route::post('/consultaHogar/download-ficha', [ConsultaHogarController::class, 'd
 
 // Rutas para los logros
 Route::post('/consulta-hogar/logros-integrante', [ConsultaHogarController::class, 'getLogrosIntegrante'])->name('consultaHogar.logros-integrante');
+Route::post('/consulta-hogar/detalle-logro', [ConsultaHogarController::class, 'getDetalleLogro'])->name('consultaHogar.detalle-logro');
 Route::get('/getDimensiones', [ConsultaHogarController::class, 'getDimensiones'])->name('getDimensiones');
 
 // Ruta de logout

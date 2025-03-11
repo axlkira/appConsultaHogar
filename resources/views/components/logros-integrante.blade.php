@@ -36,7 +36,6 @@
                                 <th>Logro</th>
                                 <th>Estado Inicial</th>
                                 <th>Estado Final</th>
-                                <th>Fecha Actualización</th>
                             </tr>
                         </thead>
                         <tbody id="logros-dimension-{id}">
@@ -51,17 +50,80 @@
 <!-- Template para logros -->
 <template id="logro-template">
     <tr>
-        <td>{logro}</td>
-        <td><span class="badge {claseDI}">{estadoDI}</span></td>
-        <td><span class="badge {clasePF}">{estadoPF}</span></td>
-        <td>{fecha}</td>
+        <td>
+            <a href="#" class="logro-link" 
+               data-idlogro="{idlogro}" 
+               data-iddimension="{iddimension}" 
+               data-folio="{folio}" 
+               data-idintegrante="{idintegrante}">
+                {logro}
+            </a>
+        </td>
+        <td><span class="badge bg-{claseDI}">{estadoDI}</span></td>
+        <td><span class="badge bg-{clasePF}">{estadoPF}</span></td>
     </tr>
 </template>
 
 <style>
-.badge-rojo { background-color: #dc3545; color: white; }
-.badge-verde { background-color: #198754; color: white; }
-.badge-gris { background-color: #6c757d; color: white; }
-.badge-azul { background-color: #0d6efd; color: white; }
-.badge-cafe { background-color: #795548; color: white; }
+.badge-rojo { 
+    background-color: #DF0101; 
+    color: white; 
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.badge-verde { 
+    background-color: #30E24E; 
+    color: white; 
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.badge-gris { 
+    background-color: #D1DFD3; 
+    color: black; 
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.badge-azul { 
+    background-color: #428BCA; 
+    color: white; 
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.badge-cafe { 
+    background-color: #8B4513; 
+    color: white; 
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.badge-blanco { 
+    background-color: #FFFFFF; 
+    color: black; 
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
 </style>
