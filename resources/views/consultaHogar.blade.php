@@ -211,9 +211,11 @@
     <div class="modal fade" id="detalleLogroModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Detalle del Logro</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <span id="dimensionLogro"></span> - <span id="nombreLogro"></span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div id="detalleLogroContent" class="container-fluid"></div>
@@ -541,8 +543,13 @@
             const folio = $(this).data('folio');
             const idintegrante = $(this).data('idintegrante');
             
-            // Mostrar spinner de carga
-            $('#loadingSpinner').removeClass('d-none');
+            // Obtener el texto del logro y su dimensión
+            const nombreLogro = $(this).text().trim();
+            const dimensionLogro = $(this).closest('.dimension-container').find('h5').text().trim();
+            
+            // Actualizar el título del modal
+            $('#dimensionLogro').text(dimensionLogro);
+            $('#nombreLogro').text(nombreLogro);
             
             // Ocultar el modal de logros
             $('#logrosModal').modal('hide');
