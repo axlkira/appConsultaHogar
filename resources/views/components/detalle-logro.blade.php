@@ -1,51 +1,21 @@
 @if(isset($logroResultado) && count($logroResultado) > 0)
     <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Detalle del Logro</h5>
-        </div>
         <div class="card-body">
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <h6>Información del Logro</h6>
-                    <table class="table table-bordered">
-                        <tr>
-                            <th class="bg-light">Dimensión:</th>
-                            <td>{{ $logroResultado[0]->dimension ?? 'No disponible' }}</td>
-                        </tr>
-                        <tr>
-                            <th class="bg-light">Logro:</th>
-                            <td>{{ $logroResultado[0]->logro ?? 'No disponible' }}</td>
-                        </tr>
-                        <tr>
-                            <th class="bg-light">Descripción:</th>
-                            <td>{{ $logroResultado[0]->descripcion ?? 'No disponible' }}</td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="col-md-6">
-                    <h6>Información del Integrante Seleccionado</h6>
-                    @if(isset($datosIntegrante) && count($datosIntegrante) > 0)
-                        <table class="table table-bordered">
-                            <tr>
-                                <th class="bg-light">Nombre:</th>
-                                <td>{{ $datosIntegrante[0]->nombrecompleto ?? 'No disponible' }}</td>
-                            </tr>
-                            <tr>
-                                <th class="bg-light">Documento:</th>
-                                <td>{{ $datosIntegrante[0]->documento ?? 'No disponible' }}</td>
-                            </tr>
-                            <tr>
-                                <th class="bg-light">Folio:</th>
-                                <td>{{ $folio }}</td>
-                            </tr>
-                            <tr>
-                                <th class="bg-light">Teléfono:</th>
-                                <td>{{ $datosIntegrante[0]->telefono ?? 'No disponible' }}</td>
-                            </tr>
-                        </table>
-                    @else
-                        <div class="alert alert-info">No hay información disponible del integrante.</div>
-                    @endif
+            <!-- Información del integrante seleccionado -->
+            <div class="alert alert-info mb-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        <strong>Integrante:</strong> {{ $datosIntegrante[0]->nombrecompleto ?? 'No disponible' }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Id_integrante:</strong> {{ $datosIntegrante[0]->idintegrante ?? 'No disponible' }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Documento:</strong> {{ $datosIntegrante[0]->documento ?? 'No disponible' }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Folio:</strong> {{ $folio }}
+                    </div>
                 </div>
             </div>
 

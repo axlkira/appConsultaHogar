@@ -547,6 +547,10 @@
             const nombreLogro = $(this).text().trim();
             const dimensionLogro = $(this).closest('.dimension-container').find('h5').text().trim();
             
+            // Obtener información del integrante
+            const nombreIntegrante = $('#nombreIntegrante').text().trim();
+            const documentoIntegrante = $(this).closest('tr').find('td:nth-child(4)').text().trim();
+            
             // Actualizar el título del modal
             $('#dimensionLogro').text(dimensionLogro);
             $('#nombreLogro').text(nombreLogro);
@@ -566,20 +570,19 @@
                     iddimension: iddimension,
                     folio: folio,
                     idintegrante: idintegrante,
-                    _token: $('meta[name="csrf-token"]').attr('content')
+                    _token: '{{ csrf_token() }}'
                 },
                 success: function(response) {
                     // Ocultar spinner de carga
                     $('#loadingSpinner').addClass('d-none');
                     
                     if(response.success) {
-                        // Cargar el contenido en el modal
                         $('#detalleLogroContent').html(response.html);
                     } else {
                         alert('Error: ' + response.error);
                     }
                 },
-                error: function(xhr) {
+                error: function(xhr, status, error) {
                     // Ocultar spinner de carga
                     $('#loadingSpinner').addClass('d-none');
                     
