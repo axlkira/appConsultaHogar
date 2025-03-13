@@ -547,7 +547,10 @@
             // Ocultar el modal de logros
             $('#logrosModal').modal('hide');
             
-            // Realizar la petición AJAX para obtener el detalle del logro
+            // Mostrar el modal de detalle con spinner
+            $('#detalleLogroContent').html('<div class="text-center"><div class="spinner-border text-primary"></div><p class="mt-2">Cargando detalle del logro...</p></div>');
+            $('#detalleLogroModal').modal('show');
+            
             $.ajax({
                 url: '{{ route("consultaHogar.detalle-logro") }}',
                 method: 'POST',
@@ -565,9 +568,6 @@
                     if(response.success) {
                         // Cargar el contenido en el modal
                         $('#detalleLogroContent').html(response.html);
-                        
-                        // Mostrar el modal
-                        $('#detalleLogroModal').modal('show');
                     } else {
                         alert('Error: ' + response.error);
                     }
