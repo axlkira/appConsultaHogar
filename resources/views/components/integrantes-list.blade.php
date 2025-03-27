@@ -7,6 +7,7 @@
                     <th>Nombre</th>
                     <th>Parentesco</th>
                     <th>Numero Contacto</th>
+                    <th>Metodología</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -18,12 +19,25 @@
                     <td>{{ $integrante->parentesco }}</td>
                     <td>{{ $integrante->telefono }}</td>
                     <td>
-                        <button class="btn btn-sm btn-primary btn-ver-logros" 
-                                data-idintegrante="{{ $integrante->idintegrante }}"
-                                data-nombre="{{ $integrante->nombrecompleto }}"
-                                data-folio="{{ $folio }}">
-                            <i class="fas fa-list-check"></i> Ver Logros
-                        </button>
+                        <span class="badge {{ $integrante->metodologia == 'MEF' ? 'bg-success' : 'bg-primary' }}">
+                            {{ $integrante->metodologia }}
+                        </span>
+                    </td>
+                    <td>
+                        @if($integrante->metodologia == 'CIF')
+                            <!-- Botón para CIF (funcionalidad actual) -->
+                            <button class="btn btn-sm btn-primary btn-ver-logros" 
+                                    data-idintegrante="{{ $integrante->idintegrante }}"
+                                    data-nombre="{{ $integrante->nombrecompleto }}"
+                                    data-folio="{{ $folio }}">
+                                <i class="fas fa-list-check"></i> Ver Logros
+                            </button>
+                        @else
+                            <!-- Botón para MEF (sin funcionalidad por ahora) -->
+                            <button class="btn btn-sm btn-success btn-ver-logros-mef">
+                                <i class="fas fa-list-check"></i> Ver Logros MEF
+                            </button>
+                        @endif
                     </td>
                 </tr>
                 @endforeach
@@ -45,6 +59,18 @@
             </div>
         </div>
     </div>
+    
+    <!-- Script para botones MEF (sin funcionalidad por ahora) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mefButtons = document.querySelectorAll('.btn-ver-logros-mef');
+            mefButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    alert('Funcionalidad de logros MEF en desarrollo');
+                });
+            });
+        });
+    </script>
 @else
     <div class="alert alert-info">
         No se encontraron integrantes registrados.

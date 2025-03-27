@@ -33,6 +33,7 @@ class ConsultaHogarController extends Controller
             $resultados = [];
             
             if (!empty($folio)) {
+                // Consulta original para CIF
                 $query = "
                     SELECT
                         tpi.folio,
@@ -42,7 +43,8 @@ class ConsultaHogarController extends Controller
                         tph.direccion,
                         tph.comuna,
                         tpi.telefono,
-                        tbar.barriovereda
+                        tbar.barriovereda,
+                        'CIF' AS metodologia
                     FROM familiam_modulo_cif.t1_principalhogar AS tph
                     INNER JOIN familiam_modulo_cif.t1_principalintegrantes AS tpi 
                         ON tph.folio = tpi.folio 
@@ -50,8 +52,31 @@ class ConsultaHogarController extends Controller
                     LEFT JOIN t_barriosc1p5 AS tbar ON tbar.codigo = tph.barrio
                     WHERE tpi.folio = ?
                 ";
-                $resultados = DB::select($query, [$folio]);
+                $resultadosCif = DB::select($query, [$folio]);
+                
+                // Consulta para MEF - Solo el representante (representante = 1)
+                $queryMef = "
+                    SELECT
+                        tis.folio,
+                        tis.idintegrante,
+                        tis.documento,
+                        CONCAT_WS(' ', tis.nombre1, tis.nombre2, tis.apellido1, tis.apellido2) AS nombrecompleto,
+                        tph.direccion,
+                        tph.comuna,
+                        tis.telefono,
+                        tbar.barriovereda,
+                        'MEF' AS metodologia
+                    FROM dbmetodologia_servidor.t1_integranteshogar_s AS tis
+                    LEFT JOIN familiam_modulo_cif.t1_principalhogar AS tph ON tis.folio = tph.folio
+                    LEFT JOIN t_barriosc1p5 AS tbar ON tbar.codigo = tph.barrio
+                    WHERE tis.folio = ? AND tis.representante = '1'
+                ";
+                $resultadosMef = DB::select($queryMef, [$folio]);
+                
+                // Combinar resultados
+                $resultados = array_merge($resultadosCif, $resultadosMef);
             } else {
+                // Consulta original para CIF
                 $query = "
                     SELECT
                         tpi.folio,
@@ -61,13 +86,36 @@ class ConsultaHogarController extends Controller
                         tph.direccion,
                         tph.comuna,
                         tpi.telefono,
-                        tbar.barriovereda
+                        tbar.barriovereda,
+                        'CIF' AS metodologia
                     FROM familiam_modulo_cif.t1_principalhogar AS tph
                     LEFT JOIN familiam_modulo_cif.t1_principalintegrantes AS tpi ON tph.folio = tpi.folio
                     LEFT JOIN t_barriosc1p5 AS tbar ON tbar.codigo = tph.barrio
                     WHERE tpi.documento = ?
                 ";
-                $resultados = DB::select($query, [$documento]);
+                $resultadosCif = DB::select($query, [$documento]);
+                
+                // Consulta para MEF
+                $queryMef = "
+                    SELECT
+                        tis.folio,
+                        tis.idintegrante,
+                        tis.documento,
+                        CONCAT_WS(' ', tis.nombre1, tis.nombre2, tis.apellido1, tis.apellido2) AS nombrecompleto,
+                        tph.direccion,
+                        tph.comuna,
+                        tis.telefono,
+                        tbar.barriovereda,
+                        'MEF' AS metodologia
+                    FROM dbmetodologia_servidor.t1_integranteshogar_s AS tis
+                    LEFT JOIN familiam_modulo_cif.t1_principalhogar AS tph ON tis.folio = tph.folio
+                    LEFT JOIN t_barriosc1p5 AS tbar ON tbar.codigo = tph.barrio
+                    WHERE tis.documento = ?
+                ";
+                $resultadosMef = DB::select($queryMef, [$documento]);
+                
+                // Combinar resultados
+                $resultados = array_merge($resultadosCif, $resultadosMef);
             }
 
             if ($request->ajax()) {
@@ -130,18 +178,36 @@ class ConsultaHogarController extends Controller
                 ], 404);
             }
 
-            // Consulta para los integrantes
+            // Consulta para los integrantes de CIF
             $queryIntegrantes = "
                 SELECT
                     tpi.documento,
                     tpi.idintegrante,
                     CONCAT_WS(' ', tpi.nombre1, tpi.nombre2, tpi.apellido1, tpi.apellido2) AS nombrecompleto,
                     tpi.parentesco,
-                    CONCAT(tpi.telefono, ' - ', tpi.celular) AS telefono
+                    CONCAT(tpi.telefono, ' - ', tpi.celular) AS telefono,
+                    'CIF' AS metodologia
                 FROM familiam_modulo_cif.t1_principalintegrantes tpi
                 WHERE tpi.folio = ?
             ";
-            $integrantes = DB::select($queryIntegrantes, [$folio]);
+            $integrantesCif = DB::select($queryIntegrantes, [$folio]);
+            
+            // Consulta para los integrantes de MEF - Solo el representante (representante = 1)
+            $queryIntegrantesMef = "
+                SELECT
+                    tis.documento,
+                    tis.idintegrante,
+                    CONCAT_WS(' ', tis.nombre1, tis.nombre2, tis.apellido1, tis.apellido2) AS nombrecompleto,
+                    tis.parentesco,
+                    CONCAT(tis.telefono, ' - ', tis.celular) AS telefono,
+                    'MEF' AS metodologia
+                FROM dbmetodologia_servidor.t1_integranteshogar_s tis
+                WHERE tis.folio = ? AND tis.representante = '1'
+            ";
+            $integrantesMef = DB::select($queryIntegrantesMef, [$folio]);
+            
+            // Combinar integrantes de ambas fuentes
+            $integrantes = array_merge($integrantesCif, $integrantesMef);
 
             // Consulta para líneas y estaciones
             $queryLineasEstaciones = "
